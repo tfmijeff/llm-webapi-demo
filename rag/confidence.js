@@ -1,8 +1,6 @@
-const { SCORE_THRESHOLD } = require("../config/default");
+const SCORE_THRESHOLD = 0.3;
 
-function isConfident(results) {
+export function isConfident(results) {
   if (!results || results.length === 0) return false;
   return results[0].score >= SCORE_THRESHOLD;
 }
-
-module.exports = { isConfident };
