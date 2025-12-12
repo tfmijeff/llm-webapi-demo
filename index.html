@@ -96,6 +96,24 @@
     <div class="note">
         ※ 本表顯示本次回答實際使用的內部詞條，用於說明 RAG 檢索依據。
     </div>
+<h3>📘 詞條關鍵字（Alias）對照表</h3>
+
+<table id="aliasTable">
+  <thead>
+    <tr>
+      <th>Alias（關鍵字）</th>
+      <th>對應詞條</th>
+      <th>來源檔案</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div class="note">
+  ※ 本表僅用於說明系統目前設定之關鍵字與詞條對應關係，不代表 AI 即時推論結果。
+</div>
+
+    
 </div>
 
 <script>
@@ -153,6 +171,96 @@ async function ask() {
         button.innerText = "送出問題";
     }
 }
+
+const aliasCatalog = [
+  {
+    title: "13.車體損失保險理賠作業",
+    source: "claims_auto_own_damage.json",
+    aliases: [
+    "車體險",
+    "車體損失怎麼賠",
+    "車子撞壞了",
+    "自撞理賠",
+    "車體險理賠流程",
+    "修車保險怎麼申請",
+    "車損理賠"
+    ]
+  },
+  {
+    title: "14.汽(機)車竊盜損失保險理賠作業",
+    source: "claims_auto_theft",
+    aliases:[
+    "車子被偷",
+    "汽車被偷",
+    "機車被偷",
+    "車輛失竊",
+    "車子失竊怎麼辦",
+    "竊盜險理賠",
+    "車被偷可以申請理賠嗎",
+    "失竊理賠流程"
+  ]
+  },
+  {
+    title: "15.任意汽車第三人責任險-財損理賠作業",
+    source: "claims_auto_third_party_property",
+    aliases: [
+    "第三人責任險",
+    "撞到別人的車",
+    "賠對方車子",
+    "財損理賠",
+    "第三人財損怎麼賠",
+    "任意險財損",
+    "賠償對方修車費"
+  ]
+  },
+  {
+    title: "11.強制汽車責任保險理賠作業",
+    source: "claims_compulsory_auto_liability",
+    aliases: [ "強制險理賠",
+    "強制汽車責任險",
+    "強制險怎麼賠",
+    "車禍強制險",
+    "強制險申請",
+    "強制險理賠流程",
+    "交通事故強制險"
+    ]
+  },
+  {
+    title: "04.相驗屍體暨死亡證明書查詢比對作業",
+    source: "claims_death_certificate_verification",
+    aliases: [
+    "死亡證明書",
+    "身故案件",
+    "死亡理賠",
+    "死亡證明查核",
+    "相驗屍體",
+    "死亡文件比對",
+    "身故案件要什麼文件"
+    ]
+  }
+];
+
+function renderAliasTable() {
+  const tbody = document.querySelector("#aliasTable tbody");
+  tbody.innerHTML = "";
+
+  aliasCatalog.forEach(entry => {
+    entry.aliases.forEach(alias => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${alias}</td>
+        <td>${entry.title}</td>
+        <td>${entry.source}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+renderAliasTable();
+
+// 頁面載入時顯示
+renderAliasTable();
 </script>
 
 </body>
