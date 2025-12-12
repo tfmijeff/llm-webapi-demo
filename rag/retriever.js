@@ -1,33 +1,56 @@
-import fs from "fs";
-import path from "path";
+// rag/retriever.js
+import { documents } from "./data.js";
 
-const KNOWLEDGE_DIR = path.resolve("./knowledge");
+/**
+ * @param {string} question
+ * @returns [{ doc, score }]
+ */
+export function retrieve(question) {
+  const q = normalize(question);
 
-function tokenize(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^\u4e00-\u9fa5a-z0-9]/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-}
+  const results = documents.map(doc => {
+    let score = 0;
 
-export function retrieve(question, topK = 2) {
-  const qTokens = tokenize(question);
+    // ① title
+    if (includesAny(doc.title, q)) {
+      score += 5;
+    }
 
-  const files = fs.readdirSync(KNOWLEDGE_DIR);
-  const docs = files.map(f =>
-    JSON.parse(fs.readFileSync(path.join(KNOWLEDGE_DIR, f), "utf8"))
-  );
+    // ② aliases
+    if (doc.aliases) {
+      doc.aliases.forEach(alias => {
+        if (includesAny(alias, q)) {
+          score += 3;
+        }
+      });
+    }
 
-  const scored = docs.map(doc => {
-    const dTokens = tokenize(doc.title + " " + doc.content);
-    const hit = qTokens.filter(t => dTokens.includes(t));
-    const score = hit.length / qTokens.length;
+    // ③ content（低權重）
+    if (doc.content && includesAny(doc.content, q)) {
+      score += 1;
+    }
+
     return { doc, score };
   });
 
-  return scored
+  // ④ 過濾沒命中的
+  const filtered = results
     .filter(r => r.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
+    .sort((a, b) => b.score - a.score);
+
+  // ⑤ 只回前 3 筆（避免 prompt 爆炸）
+  return filtered.slice(0, 3);
+}
+
+/* ------------------ helpers ------------------ */
+
+function normalize(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^\u4e00-\u9fa5a-z0-9]/g, "");
+}
+
+function includesAny(source, target) {
+  const s = normalize(source);
+  return s.includes(target) || target.includes(s);
 }
