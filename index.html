@@ -39,6 +39,27 @@
             padding: 15px;
             white-space: pre-wrap;
         }
+
+        /* 🔽 新增：檢索說明表格樣式 */
+        table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #eeeeee;
+        }
+        .note {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -46,11 +67,35 @@
 <div class="container">
     <h1>內部 LLM 知識助理（PoC Demo）</h1>
 
-   <textarea id="question"   placeholder="請輸入你的問題，例如：請說明強制險理賠流程（依內部作業原則）"></textarea>
+    <textarea
+        id="question"
+        placeholder="請輸入你的問題，例如：請說明強制險理賠流程（依內部作業原則）"
+    ></textarea>
     <br>
     <button onclick="ask()">送出問題</button>
 
     <div id="answer" class="answer"></div>
+
+    <!-- 🔽 新增：RAG 檢索說明 -->
+    <h3>🔎 檢索依據說明</h3>
+
+    <table id="retrievalTable">
+        <thead>
+            <tr>
+                <th>命中詞條</th>
+                <th>相關分數</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="2">尚未查詢</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="note">
+        ※ 本表顯示本次回答實際使用的內部詞條，用於說明 RAG 檢索依據。
+    </div>
 </div>
 
 <script>
@@ -58,6 +103,7 @@ async function ask() {
     const questionInput = document.getElementById("question");
     const answerDiv = document.getElementById("answer");
     const button = document.querySelector("button");
+    const tableBody = document.querySelector("#retrievalTable tbody");
 
     const question = questionInput.value.trim();
     if (!question) {
@@ -69,6 +115,7 @@ async function ask() {
     button.disabled = true;
     button.innerText = "思考中…";
     answerDiv.innerText = "AI 思考中，請稍候…";
+    tableBody.innerHTML = `<tr><td colspan="2">檢索中…</td></tr>`;
 
     try {
         const response = await fetch("/ask", {
@@ -78,17 +125,35 @@ async function ask() {
         });
 
         const data = await response.json();
+
+        // 顯示回答
         answerDiv.innerText = data.answer || "未取得回答";
+
+        // 🔽 填入檢索 Table
+        tableBody.innerHTML = "";
+
+        if (data.retrieval && data.retrieval.length > 0) {
+            data.retrieval.forEach(item => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${item.title}</td>
+                    <td>${item.score}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="2">本次查無可用內部詞條</td></tr>`;
+        }
 
     } catch (err) {
         answerDiv.innerText = "發生錯誤：" + err.message;
+        tableBody.innerHTML = `<tr><td colspan="2">錯誤</td></tr>`;
     } finally {
         button.disabled = false;
         button.innerText = "送出問題";
     }
 }
 </script>
-
 
 </body>
 </html>
