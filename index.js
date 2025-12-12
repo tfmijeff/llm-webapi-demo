@@ -1,8 +1,10 @@
+import path from "path";
 import express from "express";
 import OpenAI from "openai";
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.resolve("./")));
 
 // 從 Render 的環境變數讀取 API Key
 const client = new OpenAI({
