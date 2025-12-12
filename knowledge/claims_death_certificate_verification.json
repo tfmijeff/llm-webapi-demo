@@ -1,0 +1,13 @@
+{
+  "id": "claims_death_certificate_verification",
+  "title": "04.相驗屍體暨死亡證明書查詢比對作業",
+  "source": "wiki.js",
+  "content": "## 一、作業說明\n1. 依據保險犯罪防制中心及金融監督管理委員會相關函文辦理。\n2. 受理涉身故之賠案時，須取得身故者親屬或配偶出具之授權書，同意本公司就所檢附之相驗屍體證明書或死亡證明書內容，與相關單位死亡通報系統資料進行比對。\n3. 本作業由理賠部管理科專責人員依相關作業要點辦理，賠案受理同仁應將同意書及死亡證明文件即時彙交管理科。",
+  "metadata": {
+    "domain": "claims",
+    "process": "death_verification",
+    "risk_control": true,
+    "language": "zh-TW",
+    "version": "v1"
+  }
+}
