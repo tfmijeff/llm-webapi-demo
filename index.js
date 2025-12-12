@@ -35,11 +35,16 @@ app.post("/ask", async (req, res) => {
     // ④ G：LLM
     const answer = await askOpenAI(prompt);
 
-    res.json({
-      answer,
-      confidence: results[0].score,
-      source: results[0].doc.title
-    });
+res.json({
+  answer,
+  confidence: results[0].score,
+  source: results[0].doc.title,
+  retrieval: results.map(r => ({
+    title: r.doc.title,
+    score: Number(r.score.toFixed(2))
+  }))
+});
+
 
   } catch (err) {
     res.status(500).json({ error: err.message });
